@@ -115,7 +115,6 @@ kubectl get pod -o wide pod-<username>
 Finally, lets check the git version in the image and verify it works! In the shell we can do:
 
 ```
-cd /scratch
 git --version
 git clone https://github.com/mahidhar/sc25_k8s_tutorial.git
 ``` 
