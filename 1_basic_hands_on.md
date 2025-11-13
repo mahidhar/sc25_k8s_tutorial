@@ -306,7 +306,7 @@ kubectl delete -f badjob1.yaml
 
 Running a single application iteration is interesting, but science users often need many executions to get their science done. So, let's do a simple parameter sweep with a scientific application. We will use the LAMMPS molecular dynamics code with a Lennard-Jones benchmark problem. In the example we will do a parameter sweep with varying bin sizes. We run 4 different values for the parameter.
 
-As usual, you can copy-and-paste the lines below, but please do replace “<username>” with your own name.
+As usual, you can copy-and-paste the lines below, but please do replace "username" with your own name.
 
 BTW: You probably noted that you need to provide a unique name for each job you submit.
 This is indeed a requirement in Kubernetes.
