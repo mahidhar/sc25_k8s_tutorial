@@ -304,48 +304,78 @@ kubectl delete -f badjob1.yaml
 
 ## Parameter sweep
 
-Running a single application iteration is interesting, but science users often need many executions to get their science done.
+Running a single application iteration is interesting, but science users often need many executions to get their science done. So, let's do a simple parameter sweep with a scientific application. We will use the LAMMPS molecular dynamics code with a Lennard-Jones benchmark problem. In the example we will do a parameter sweep with varying bin sizes. We run 4 different values for the parameter.
 
-So, let's do a simple parameter sweep. I.e. let's execute 10 pods with the same code but different inputs.
-
-As usual, you can copy-and-paste the lines below, but please do replace “username” with your own id.
+As usual, you can copy-and-paste the lines below, but please do replace “<username>” with your own name.
 
 BTW: You probably noted that you need to provide a unique name for each job you submit.
 This is indeed a requirement in Kubernetes.
 (You can reuse the same name after you delete an old job, of course)
 
-###### job2.yaml:
+###### lammps_job.yaml:
 
 ```yaml
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: job2-<username>
+  name: lammps-nvidia-gpu1-<username>
 spec:
   completionMode: Indexed
-  completions: 10
-  parallelism: 10
-  ttlSecondsAfterFinished: 1800
+  completions: 4
+  parallelism: 4
+  ttlSecondsAfterFinished: 180
   template:
     spec:
-      restartPolicy: OnFailure
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: nvidia.com/gpu.product
+                operator: In
+                values:
+                - NVIDIA-A10
+      volumes:
+          - name: scratch
+            emptyDir: {}
       containers:
-      - name: mypod
-        image: rockylinux:9
+      - name: test
+        image: nvcr.io/hpc/lammps:patch_4May2022
+        command: ["/bin/bash", "-c"]
+        args:
+        - >-
+            cd /scratch;
+            wget https://www.lammps.org/inputs/in.lj.txt;
+            wget https://gitlab.com/NVHPC/ngc-examples/-/raw/master/lammps/single-node/run_lammps.sh;
+            chmod a+x run_lammps.sh;
+            result=$(awk "BEGIN {print 1.2+0.8*$JOB_COMPLETION_INDEX}");
+            echo "Binsize=$result";
+            sed -i "s/2.8/$result/g" run_lammps.sh;
+            nvidia-smi;
+            export PATH=/usr/local/lammps/sm86/bin:$PATH ;
+            export LD_LIBRARY_PATH=/usr/local/lammps/sm86/lib:$LD_LIBRARY_PATH ;
+            ./run_lammps.sh ;
+        volumeMounts:
+            - name: scratch
+              mountPath: /scratch
         resources:
-           limits:
-             memory: 100Mi
-             cpu: 0.1
-           requests:
-             memory: 100Mi
-             cpu: 0.1
-        command: ["sh", "-c", "let s=10+2*$JOB_COMPLETION_INDEX; date; sleep $s; date; echo Done $JOB_COMPLETION_INDEX"]
+          limits:
+            memory: 16Gi
+            cpu: "4"
+            nvidia.com/gpu: "1"
+            ephemeral-storage: 10Gi
+          requests:
+            memory: 16Gi
+            cpu: "4"
+            nvidia.com/gpu: "1"
+            ephemeral-storage: 10Gi
+      restartPolicy: Never
 ```
 
 Now let’s create the job:
 
 ```bash
-kubectl create -f job2.yaml
+kubectl create -f lammps_job.yaml
 ```
 
 Check for the job and the associated pods:
@@ -355,12 +385,12 @@ kubectl get jobs
 kubectl get pods
 ```
 
-Did it start 10 pods?
+Did it start 4 pods?
 
 Now wait for them to finish, and then look at the stdout with
 
 ```bash
-kubectl logs job2-<username>-<index>-<hash>
+kubectl logs lammps-nvidia-gpu1-<username>-<index>-<hash>
 ``` 
 
 ## The end
