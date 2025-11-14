@@ -71,7 +71,7 @@ This simple example:
 - Uses a small set of sample documents to demonstrate Milvus vector storage and retrieval
 - Shows RAG with Ollama LLM
 
-**Note:** This example connects to the `sc25_milvus` database using credentials from the Kubernetes secret `sc25-milvus-credentials`. The collection name is `rag_documents_vectordb_example`. The script uses environment variables for Milvus connection, so no manual editing is needed.
+**Note:** This example connects to the `sc25_milvus` database using credentials from the Kubernetes secret `sc25-milvus-credentials`. The collection name is `simple_rag_example`. You can change the name in the `milvus-example.py` file if you want to create a separate collection of your own. For all other aspects, the script uses environment variables for Milvus connection, so no manual editing is needed.
 
 ## End
 
