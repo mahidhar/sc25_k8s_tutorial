@@ -84,7 +84,7 @@ spec:
       requests:
         memory: 100Mi
         cpu: 100m
-    command: ["sh", "-c", "sleep 10000"]
+    command: ["sh", "-c", "sleep 600"]
 ```
 
 But we set them to be really low, so it was virtually guaranteed that the Pod would start.
@@ -335,7 +335,7 @@ spec:
       requests:
         memory: 100Mi
         cpu: 100m
-    command: ["sh", "-c", "sleep 10000"]
+    command: ["sh", "-c", "sleep 600"]
 ```
 Where did the pod land? Is it on one of the us-central region nodes? Clear up the pod and then lets try a zonal case. Lets pick one of the zones (fullerton)
 
@@ -365,7 +365,7 @@ spec:
       requests:
         memory: 100Mi
         cpu: 100m
-    command: ["sh", "-c", "sleep 10000"]
+    command: ["sh", "-c", "sleep 600"]
 ```
 Check if your pod landed on a fullerton node!
 
