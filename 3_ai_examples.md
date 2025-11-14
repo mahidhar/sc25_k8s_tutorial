@@ -35,7 +35,7 @@ rag.invoke("What affects pigeon plumage ?")
 
 ## RAG example using Milvus
 
-This example demonstrates RAG using Milvus as the vector database instead of ChromaDB. Milvus is a distributed vector database designed for scalable similarity search.
+This example demonstrates RAG using Milvus as the vector database instead of ChromaDB. Milvus is a distributed vector database designed for scalable similarity search. In the milvus-rag.yaml file please change the username to a unique name for yourself.
 
 Start up the pod:
 ```
@@ -44,7 +44,7 @@ kubectl apply -f milvus-rag.yaml
 Watch the logs and make sure you wait till the installs are done:
 
 ```
-kubectl logs vectordb-example -n sc25
+kubectl logs vectordb-example-username -n sc25
 ```
 The pod automatically:
 - Installs all Python dependencies
@@ -54,7 +54,7 @@ The pod automatically:
 
 Download the simple example script into the pod once it is running:
 ```
-kubectl exec -it vectordb-example -n sc25 -- /bin/bash
+kubectl exec -it vectordb-example-username -n sc25 -- /bin/bash
 cd /scratch
 wget https://raw.githubusercontent.com/groundsada/nrp-milvus-example/refs/heads/main/milvus-example.py
 ```
@@ -62,7 +62,7 @@ wget https://raw.githubusercontent.com/groundsada/nrp-milvus-example/refs/heads/
 Once the installation is complete (check logs), you can run the example:
 
 ```
-kubectl exec -it vectordb-example -n sc25 -- /bin/bash
+kubectl exec -it vectordb-example-username -n sc25 -- /bin/bash
 cd /scratch
 python3 milvus-example.py
 ```
