@@ -214,6 +214,56 @@ What do you see in /mnt/mylogs ? Once you are done exploring, please delete both
 
 If you have time, try to do the same exercise but using emptyDir. And verify that the logs indeed do not get preserved between pod restarts.
 
+## CVMFS Mounts
+CVMFS is a distributed filesystem that allows you to mount software repositories and datasets on your local machine. It is used to distribute software and data across the grid, and is widely used in the High Energy Physics community. We can create PVC and mount specific subpaths as needed. We will setup a pod where we mount a subpath with CMS software. First setup the PVC.
+###### cvmfspvc.yaml:
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cvmfs-<username>
+spec:
+  accessModes:
+  - ReadOnlyMany
+  resources:
+    requests:
+      # Volume size value has no effect and is ignored
+      # by the driver, but must be non-zero.
+      storage: 1
+  storageClassName: cvmfs
+```
+Next we start a pod with the subpath mounted
+###### inspectcvmfs.yaml:
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: inspect-<username>
+spec:
+  containers:
+  - name: mypod
+    image: alpine/git:v2.49.1
+    resources:
+      limits:
+        memory: 1Gi
+        cpu: 1
+      requests:
+        memory: 100Mi
+        cpu: 100m
+    command: ["sh", "-c", "sleep 10000"]
+    volumeMounts:
+      - name: my-cvmfs
+        subPath: cms.cern.ch
+        mountPath: /my-cms-cvmfs
+        # CVMFS automount volumes must be mounted with HostToContainer mount propagation.
+        mountPropagation: HostToContainer
+  volumes:
+   - name: my-cvmfs
+     persistentVolumeClaim:
+       claimName: cvmfs-<username>
+```
+Once this pod is running, get interactive access and check whats in /my-cms-cvmfs!
+
 ## Using S3 Storage
 Some times the high I/O workloads can cause problems with CephFS based PVCs and end up being the bottlenecks on computational workloads. The S3 interface is scalable and universally accessible, so storage with S3 interfaces can be a great place to store large datasets which can be simultaneously accessed either from inside the cluster or externally. 
 
