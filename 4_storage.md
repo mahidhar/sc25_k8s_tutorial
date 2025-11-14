@@ -181,22 +181,36 @@ spec:
       restartPolicy: Never
 ```
 
-Create the job and once any of the pods has started, log into it using kubectl exec.
+Create the job and once all four pods complete (or even while they are running), use the following inspection pod to check the output in /mnt/mylogs.
 
-Check the content of /mnt/mylogs
+###### inspectpvc.yaml:
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: inspect-<username>
+spec:
+  volumes:
+  - name: mydata
+    persistentVolumeClaim:
+        claimName: vol-<username>
+  containers:
+  - name: mypod
+    image: alpine/git:v2.49.1
+    volumeMounts:
+    - name: mydata
+      mountPath: /mnt/mylogs
+    resources:
+      limits:
+        memory: 1Gi
+        cpu: 1
+      requests:
+        memory: 100Mi
+        cpu: 100m
+    command: ["sh", "-c", "sleep 10000"]
 ```
-ls -l /mnt/mylogs
-```
 
-Try to create a file in there, with any content you like.
-
-Now, delete the job, and create another one (with the same name).
-
-Once one of the new pods start, log into it using kubectl exec.
-
-What do you see in /mnt/mylogs ?
-
-Once you are done exploring, please delete the pod.
+What do you see in /mnt/mylogs ? Once you are done exploring, please delete both the job and the inspection pod. You can also remove the PVC but remember if you do so, the data is not recoverable (i.e. do not do this in your research namespaces!). 
 
 If you have time, try to do the same exercise but using emptyDir. And verify that the logs indeed do not get preserved between pod restarts.
 
