@@ -300,6 +300,75 @@ Now check you Pod. How long did it take for it to start? What GPU type did you g
 
 After you are done exploring, remember to destroy the pod.
 
+## Region and Zone labels
+
+There two main node labels to note are topology.kubernetes.io/region and topology.kubernetes.io/zone. Region is a larger entity, which corresponds to timezones in US and a country for other locations. A zone is a local place like a university or datacenter inside a university. You can list the available regions and zones as follows.
+
+```
+kubectl get nodes -L topology.kubernetes.io/zone,topology.kubernetes.io/region
+```
+Lets pick one of the regions (us-central)
+
+###### test-region.yaml:
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: regiontest-<username>
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: topology.kubernetes.io/region
+            operator: In
+            values:
+            - us-central
+  containers:
+  - name: mypod
+    image: alpine/git:v2.49.1
+    resources:
+      limits:
+        memory: 1Gi
+        cpu: 1
+      requests:
+        memory: 100Mi
+        cpu: 100m
+    command: ["sh", "-c", "sleep 10000"]
+```
+Where did the pod land? Is it on one of the us-central zones? Clear up the pod and then lets try a zonal case. Lets pick one of the zones (fullerton)
+
+###### test-zone.yaml:
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: zonetest-<username>
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: topology.kubernetes.io/zone
+            operator: In
+            values:
+            - fullerton
+  containers:
+  - name: mypod
+    image: alpine/git:v2.49.1
+    resources:
+      limits:
+        memory: 1Gi
+        cpu: 1
+      requests:
+        memory: 100Mi
+        cpu: 100m
+    command: ["sh", "-c", "sleep 10000"]
+```
+Check if your pod landed on a fullerton node!
+
 ## The end
 
 We do not include hands-on exercises based on priorities, as they are very non-deterministic.
