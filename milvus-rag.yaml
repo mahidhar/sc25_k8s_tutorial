@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vectordb-example-<username>
+  namespace: sc25
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: nvidia.com/gpu.product
+            operator: In
+            values:
+            - NVIDIA-A10
+  volumes:
+  - name: scratch
+    emptyDir: {}
+  - name: shm
+    emptyDir:
+      medium: Memory
+      sizeLimit: 8Gi
+  containers:
+  - name: mypod
+    image: nvidia/cuda:12.1.0-runtime-ubuntu22.04
+    resources:
+      limits:
+        memory: 24Gi
+        cpu: 4
+        nvidia.com/gpu: 1
+      requests:
+        memory: 24Gi
+        cpu: 4
+        nvidia.com/gpu: 1
+    command: ["/bin/bash", "-c"]
+    args:
+    - >-
+        apt update && apt install -y python3 python3-pip wget vim curl;
+        pip3 install --upgrade pip;
+        pip3 install -U pymilvus>=2.3.0 sentence-transformers>=2.2.0 torch>=2.0.0 numpy>=1.24.0 langchain>=0.1.0 langchain-community>=0.0.20 langchain-milvus>=0.1.0 langchain-classic>=1.0.0 langchain-text-splitters>=1.0.0;
+        curl -fsSL https://ollama.com/install.sh | sh;
+        export HOME=/scratch;
+        cd $HOME;
+        echo "Copy vectordb-simple-example.py into /scratch after the pod is ready.";
+        if [ ! -f vectordb-simple-example.py ]; then
+          echo "Waiting for script... (the pod will keep running for 1 hour)";
+        fi;
+        nohup ollama serve > /tmp/ollama.log 2>&1 &
+        sleep 3;
+        ollama pull mistral > /tmp/ollama-pull.log 2>&1 &
+        echo "Setup complete! Ollama is starting and mistral model is downloading in background.";
+        echo "Run: python3 /scratch/vectordb-simple-example.py";
+        sleep 3600;
+    env:
+    - name: MILVUS_HOST
+      valueFrom:
+        secretKeyRef:
+          name: sc25-milvus-credentials
+          key: host
+    - name: MILVUS_PORT
+      valueFrom:
+        secretKeyRef:
+          name: sc25-milvus-credentials
+          key: port
+    - name: MILVUS_USER
+      valueFrom:
+        secretKeyRef:
+          name: sc25-milvus-credentials
+          key: username
+    - name: MILVUS_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: sc25-milvus-credentials
+          key: password
+    - name: MILVUS_SECURE
+      valueFrom:
+        secretKeyRef:
+          name: sc25-milvus-credentials
+          key: secure
+    - name: MILVUS_DB_NAME
+      valueFrom:
+        secretKeyRef:
+          name: sc25-milvus-credentials
+          key: database
+    volumeMounts:
+            - name: scratch
+              mountPath: /scratch
+            - name: shm
+              mountPath: /dev/shm
+
