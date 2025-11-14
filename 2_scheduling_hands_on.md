@@ -25,7 +25,11 @@ Now, pick one node, and see what other resources it has:
 kubectl get nodes -o yaml <nodename>
 ```
 
-See how many CPU cores and how much memory it has.
+See how many CPU cores and how much memory it has and other feature labels. For example you can look for the CUDA driver versions.
+
+```
+kubectl get nodes -o yaml <nodename>  | grep cuda.driver-version | grep -v nfd
+```
 
 If you picked a node with a GPU, look for the "nvidia.com/gpu.product" in the output. Did it match?
 
