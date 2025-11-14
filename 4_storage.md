@@ -163,7 +163,7 @@ spec:
             nvidia-smi;
             export PATH=/usr/local/lammps/sm86/bin:$PATH ;
             export LD_LIBRARY_PATH=/usr/local/lammps/sm86/lib:$LD_LIBRARY_PATH ;
-            ./run_lammps.sh 2 >& 1 > log$JOB_COMPLETION_INDEX;
+            ./run_lammps.sh > log$JOB_COMPLETION_INDEX;
         volumeMounts:
             - name: mydata
               mountPath: /mnt/mylogs
