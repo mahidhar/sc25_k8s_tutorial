@@ -2,6 +2,7 @@
 
 An upcoming tutorial at SC25.
 To be presented by Mahidhar Tatineni and Dmitry Mishin
+Tutorial material has been updated from prior versions presented by Igor Sfiligoi, Mahidhar Tatineni and Dmitry Mishin.
 
 # Agenda
 ```
