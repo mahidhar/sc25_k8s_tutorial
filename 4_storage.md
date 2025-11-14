@@ -117,41 +117,68 @@ You can check the progress with
 kubectl get events --sort-by=.metadata.creationTimestamp --field-selector involvedObject.name=vol-<username>
 ```
 
-Now we can attach it to our pod. Create one with (replacing `username`):
+Now we can attach it to our pod. Lets get back to our parameter sweep example. This time we will write the output into the shared PVC mount. Once the job is complete, we can launch a separate pod to inspect the output.
 
-###### s3.yaml:
-
+###### storage-example3.yaml:
 ```yaml
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: s3-<username>
+  name: lammps-nvidia-gpu1-<username>
 spec:
   completionMode: Indexed
-  completions: 10
-  parallelism: 10
-  ttlSecondsAfterFinished: 1800
+  completions: 4
+  parallelism: 4
+  ttlSecondsAfterFinished: 180
   template:
     spec:
-      restartPolicy: OnFailure
-      containers:
-      - name: mypod
-        image: rockylinux:8
-        resources:
-           limits:
-             memory: 100Mi
-             cpu: 0.1
-           requests:
-             memory: 100Mi
-             cpu: 0.1
-        command: ["sh", "-c", "let s=2*$JOB_COMPLETION_INDEX; d=`date +%s`; date; sleep $s; (echo Job $JOB_COMPLETION_INDEX; ls -l /mnt/mylogs/)  > /mnt/mylogs/log.$d.$JOB_COMPLETION_INDEX; sleep 1000"]
-        volumeMounts:
-        - name: mydata
-          mountPath: /mnt/mylogs
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: nvidia.com/gpu.product
+                operator: In
+                values:
+                - NVIDIA-A10
       volumes:
-      - name: mydata
-        persistentVolumeClaim:
-          claimName: vol-<username>
+          - name: mydata
+            persistentVolumeClaim:
+              claimName: vol-<username>
+      containers:
+      - name: test
+        image: nvcr.io/hpc/lammps:patch_4May2022
+        command: ["/bin/bash", "-c"]
+        args:
+        - >-
+            cd /mnt/mylogs;
+            mkdir R$JOB_COMPLETION_INDEX;
+            cd R$JOB_COMPLETION_INDEX;
+            wget https://www.lammps.org/inputs/in.lj.txt;
+            wget https://gitlab.com/NVHPC/ngc-examples/-/raw/master/lammps/single-node/run_lammps.sh;
+            chmod a+x run_lammps.sh;
+            result=$(awk "BEGIN {print 1.2+0.8*$JOB_COMPLETION_INDEX}");
+            echo "Binsize=$result";
+            sed -i "s/2.8/$result/g" run_lammps.sh;
+            nvidia-smi;
+            export PATH=/usr/local/lammps/sm86/bin:$PATH ;
+            export LD_LIBRARY_PATH=/usr/local/lammps/sm86/lib:$LD_LIBRARY_PATH ;
+            ./run_lammps.sh 2 >& 1 > log$JOB_COMPLETION_INDEX;
+        volumeMounts:
+            - name: mydata
+              mountPath: /mnt/mylogs
+        resources:
+          limits:
+            memory: 16Gi
+            cpu: "4"
+            nvidia.com/gpu: "1"
+            ephemeral-storage: 10Gi
+          requests:
+            memory: 16Gi
+            cpu: "4"
+            nvidia.com/gpu: "1"
+            ephemeral-storage: 10Gi
+      restartPolicy: Never
 ```
 
 Create the job and once any of the pods has started, log into it using kubectl exec.
