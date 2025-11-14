@@ -238,7 +238,7 @@ Change to the scratch directory and run the python script that lists the data in
 
 ```
 cd /scratch
-wget https://raw.githubusercontent.com/mahidhar/sc24_k8s_tutorial/refs/heads/main/list-download-s3.py
+wget https://raw.githubusercontent.com/mahidhar/sc25_k8s_tutorial/refs/heads/main/list-download-s3.py
 python3 list-download-s3.py
 ```
 
@@ -248,7 +248,7 @@ mkdir data
 cd data
 tar -xf ../cifar-10-python.tar.gz
 cd ../
-wget https://raw.githubusercontent.com/mahidhar/sc24_k8s_tutorial/refs/heads/main/run-training.py
+wget https://raw.githubusercontent.com/mahidhar/sc25_k8s_tutorial/refs/heads/main/run-training.py
 python3 run-training.py
 ```
 
