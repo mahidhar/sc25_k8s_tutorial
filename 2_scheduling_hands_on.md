@@ -302,7 +302,7 @@ After you are done exploring, remember to destroy the pod.
 
 ## Region and Zone labels
 
-There two main node labels to note are topology.kubernetes.io/region and topology.kubernetes.io/zone. Region is a larger entity, which corresponds to timezones in US and a country for other locations. A zone is a local place like a university or datacenter inside a university. You can list the available regions and zones as follows.
+The Nautilus Kubernetes cluster is geographically distributed across many US and international regions. There two main node labels that can help in scheduling jobs in specific regions and locations. They are topology.kubernetes.io/region and topology.kubernetes.io/zone. Region is a larger entity, which corresponds to timezones in US and a country for other locations. A zone is a local place like a university or datacenter inside a university. You can list the available regions and zones as follows.
 
 ```
 kubectl get nodes -L topology.kubernetes.io/zone,topology.kubernetes.io/region
@@ -337,7 +337,7 @@ spec:
         cpu: 100m
     command: ["sh", "-c", "sleep 10000"]
 ```
-Where did the pod land? Is it on one of the us-central zones? Clear up the pod and then lets try a zonal case. Lets pick one of the zones (fullerton)
+Where did the pod land? Is it on one of the us-central region nodes? Clear up the pod and then lets try a zonal case. Lets pick one of the zones (fullerton)
 
 ###### test-zone.yaml:
 ```yaml
