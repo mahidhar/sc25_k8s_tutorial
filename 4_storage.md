@@ -210,7 +210,7 @@ spec:
     command: ["sh", "-c", "sleep 10000"]
 ```
 
-What do you see in /mnt/mylogs ? Once you are done exploring, please delete both the job and the inspection pod. You can also remove the PVC but remember if you do so, the data is not recoverable (i.e. do not do this in your research namespaces!). 
+What do you see in /mnt/mylogs ? Once you are done exploring, please delete both the job and the inspection pod.
 
 If you have time, try to do the same exercise but using emptyDir. And verify that the logs indeed do not get preserved between pod restarts.
 
