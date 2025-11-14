@@ -34,6 +34,7 @@ rag.invoke("What affects pigeon plumage ?")
 ```
 
 ## RAG example using Milvus
+### Credit: Mohammad Sada, SDSC
 
 This example demonstrates RAG using Milvus as the vector database instead of ChromaDB. Milvus is a distributed vector database designed for scalable similarity search. In the milvus-rag.yaml file please change the username to a unique name for yourself.
 
