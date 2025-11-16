@@ -23,7 +23,7 @@ ollama pull mistral
 ```
 We can now download our test script and run it:
 ```
-wget https://raw.githubusercontent.com/mahidhar/pearc24_k8s_tutorial/main/test.py
+wget https://raw.githubusercontent.com/mahidhar/sc25_k8s_tutorial/refs/heads/main/test.py
 python3 -i test.py
 ```
 Now we can run the rag within the interactive python interpreter. Do the following one by one (i.e. wait for results before moving to the next one)
