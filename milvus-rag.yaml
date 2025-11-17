@@ -41,15 +41,11 @@ spec:
         curl -fsSL https://ollama.com/install.sh | sh;
         export HOME=/scratch;
         cd $HOME;
-        echo "Copy vectordb-simple-example.py into /scratch after the pod is ready.";
-        if [ ! -f vectordb-simple-example.py ]; then
-          echo "Waiting for script... (the pod will keep running for 1 hour)";
-        fi;
         nohup ollama serve > /tmp/ollama.log 2>&1 &
-        sleep 3;
+        sleep 5;
         ollama pull mistral > /tmp/ollama-pull.log 2>&1 &
         echo "Setup complete! Ollama is starting and mistral model is downloading in background.";
-        echo "Run: python3 /scratch/vectordb-simple-example.py";
+        echo "Follow instructions in 3_ai_examples.md file to download using wget and run example script ";
         sleep 3600;
     env:
     - name: MILVUS_HOST
