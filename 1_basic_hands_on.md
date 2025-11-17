@@ -27,7 +27,7 @@ To easily see the current state of the namespace, you can use one of the GUI too
 
 Let’s create a simple generic pod, and login into it.
 
-You can copy-and-paste the lines below, but please do replace “username” with your own id.\
+You can copy-and-paste the lines below, but please do replace “username” with your own id. Also remove the angle brackets around the username (we put those to highlight the need to change). \
 All the participants in this hands-on session share the same namespace, so you will get name collisions if you don’t.
 
 ###### pod1.yaml:
