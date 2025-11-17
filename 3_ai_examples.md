@@ -60,7 +60,13 @@ cd /scratch
 wget https://raw.githubusercontent.com/groundsada/nrp-milvus-example/refs/heads/main/milvus-example.py
 ```
 
-Once the installation is complete (check logs), you can run the example:
+Once the installation is complete (check logs), you can run the example. \
+**Note:** This example connects to the `sc25_milvus` database using credentials from the Kubernetes secret `sc25-milvus-credentials`. The collection name is `simple_rag_example`. You can change the name in the `milvus-example.py` file if you want to create a separate collection of your own. There are two places where the collection name is specified. Look for:
+
+```
+ collection_name="simple_rag_example"
+```
+For all other aspects, the script uses environment variables for Milvus connection, so no manual editing is needed.
 
 ```
 kubectl exec -it vectordb-example-username -n sc25 -- /bin/bash
@@ -72,7 +78,6 @@ This simple example:
 - Uses a small set of sample documents to demonstrate Milvus vector storage and retrieval
 - Shows RAG with Ollama LLM
 
-**Note:** This example connects to the `sc25_milvus` database using credentials from the Kubernetes secret `sc25-milvus-credentials`. The collection name is `simple_rag_example`. You can change the name in the `milvus-example.py` file if you want to create a separate collection of your own. For all other aspects, the script uses environment variables for Milvus connection, so no manual editing is needed.
 
 ## End
 
